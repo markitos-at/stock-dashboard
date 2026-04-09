@@ -30,19 +30,33 @@
       rows.forEach(row => {
         if (!row) return;
 
-        const [ticker, price] = row.split(",");
+        const [ticker, price, change] = row.split(",");
+
+        const changeNum = parseFloat(change);
+        const isUp = changeNum >= 0;
+
+        const color = isUp ? "text-green-400" : "text-red-400";
+        const bg = isUp ? "bg-green-500/10" : "bg-red-500/10";
+        const arrow = isUp ? "▲" : "▼";
 
         container.innerHTML += `
-          <div class="flex justify-between items-center bg-gray-800 p-4 rounded-2xl">
-            <span class="font-semibold text-lg">${ticker}</span>
-            <span class="text-xl font-bold">$${parseFloat(price).toFixed(2)}</span>
+          <div class="flex justify-between items-center ${bg} p-4 rounded-2xl">
+            <div>
+              <div class="font-semibold text-lg">${ticker}</div>
+              <div class="text-sm ${color}">
+                ${arrow} ${(changeNum * 100).toFixed(2)}%
+              </div>
+            </div>
+            <div class="text-2xl font-bold">
+              $${parseFloat(price).toFixed(2)}
+            </div>
           </div>
         `;
       });
     }
 
     loadStocks();
-    setInterval(loadStocks, 90000); // refresh every 60 sec
+    setInterval(loadStocks, 90000); // refresh every 90 sec
   </script>
 
 </body>
