@@ -5,9 +5,9 @@
   <title>Stock Board</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center h-screen">
+<body class="bg-gray-900 text-white flex items-start justify-center min-h-screen p-4">
 
-  <div class="w-96">
+  <div class="w-[90%] max-w-md mx-auto">
     <h1 class="text-2xl mb-6 text-center">📈 Stock Check</h1>
     
     <div id="stocks" class="space-y-3"></div>
@@ -31,9 +31,9 @@
         const [ticker, price] = row.split(",");
 
         container.innerHTML += `
-          <div class="flex justify-between bg-gray-800 p-3 rounded-xl">
-            <span class="font-semibold">${ticker}</span>
-            <span>$${parseFloat(price).toFixed(2)}</span>
+          <div class="flex justify-between items-center bg-gray-800 p-4 rounded-2xl">
+            <span class="font-semibold text-lg">${ticker}</span>
+            <span class="text-xl font-bold">$${parseFloat(price).toFixed(2)}</span>
           </div>
         `;
       });
