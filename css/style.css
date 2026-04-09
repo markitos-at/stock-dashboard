@@ -2,7 +2,7 @@
     padding: 20px;   
     width: 100%; 
 }
-.stocks {
+#stocks {
     max-width: 500px;
     margin: 0 auto;
 }
