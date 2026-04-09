@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stock Board</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center h-screen">
+
+  <div class="w-96">
+    <h1 class="text-2xl mb-6 text-center">📈 My Stocks</h1>
+    
+    <div id="stocks" class="space-y-3"></div>
+  </div>
+
+  <script>
+    const SHEET_URL = "YOUR_CSV_URL_HERE";
+
+    async function loadStocks() {
+      const res = await fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vSNyk88km-5bG4EIzBNezvRHjmiZS4roGe_l3hb_0dexC_l4yC25shHbmxsmqWP3GUBdYU466lnaGok/pub?output=csv");
+      const text = await res.text();
+
+      const rows = text.split("\n").slice(1);
+      const container = document.getElementById("stocks");
+
+      container.innerHTML = "";
+
+      rows.forEach(row => {
+        if (!row) return;
+
+        const [ticker, price] = row.split(",");
+
+        container.innerHTML += `
+          <div class="flex justify-between bg-gray-800 p-3 rounded-xl">
+            <span class="font-semibold">${ticker}</span>
+            <span>$${parseFloat(price).toFixed(2)}</span>
+          </div>
+        `;
+      });
+    }
+
+    loadStocks();
+    setInterval(loadStocks, 60000); // refresh every 60 sec
+  </script>
+
+</body>
+</html>
