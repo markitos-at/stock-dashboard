@@ -36,6 +36,7 @@
 
       const rows = text.split("\n").slice(1);
       const container = document.getElementById("stocks");
+      let updated = false; // for updating base prices
 
       container.innerHTML = "";
 
@@ -43,15 +44,15 @@
       rows.forEach(row => {
         if (!row) return;
 
-        const [ticker, price, change] = row.split(",");
+        const [ticker, price] = row.split(",");
+        const currentPrice = parseFloat(price); // get current price
+        const basePrice = basePrices[ticker];
 
         // Initialize base price if missing
         if (!basePrices[ticker]) {
           basePrices[ticker] = currentPrice;
-          saveBasePrices(basePrices);
+          updated = true;
         }
-
-        const basePrice = basePrices[ticker];
 
         // Calculate change
         const changeNum = (currentPrice - basePrice) / basePrice;
@@ -76,6 +77,8 @@
           </div>
         `;
       });
+
+      if (updated) saveBasePrices(basePrices);
     }
 
     loadStocks();
