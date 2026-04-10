@@ -1,0 +1,13 @@
+# Log files
+*.log
+
+# Large media files
+*.mp4
+*.tiff
+*.avi
+*.flv
+*.mov
+*.wmv
+
+# Cursor AI rules file
+.cursorrules

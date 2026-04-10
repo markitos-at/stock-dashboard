@@ -2,22 +2,20 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: #111827;
-  color: white;
   display: flex;
   justify-content: center;
   padding: 20px;
+  opacity: 1;
 }
 
 .container {
-    padding: 20px;   
-    width: 100%; 
+  width: 100%;
+  padding: 20px;
 }
+
 #stocks {
-    max-width: 500px;
-    margin: 0 auto;
-}
-.text-white {
-    color: white;
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 h1 {
@@ -31,11 +29,12 @@ h1 {
   align-items: center;
   padding: 16px;
   border-radius: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 15px;
   background: #1f2937;
+  color: white;
 }
 
-.stock.up {
+.stock.up.up {
   background: rgba(34, 197, 94, 0.1);
 }
 
@@ -59,4 +58,8 @@ h1 {
 
 .change.up {
   color: #4ade80;
+}
+
+.text-white {
+  color: white;
 }

@@ -22,35 +22,45 @@
     async function loadStocks() {
       const res = await fetch(SHEET_URL);
       const text = await res.text();
-      console.log('price.updated');
+      const today = getToday();
+      const storedDate = localStorage.getItem("stockDate");
+      console.log('quote.updated');
+
+      let basePrices = getBasePrices();
+
+      // If new day → reset everything
+      if (storedDate !== today) {
+        basePrices = {};
+        localStorage.setItem("stockDate", today);
+      }
 
       const rows = text.split("\n").slice(1);
       const container = document.getElementById("stocks");
 
       container.innerHTML = "";
 
+      // loop
       rows.forEach(row => {
         if (!row) return;
 
         const [ticker, price, change] = row.split(",");
 
-        const changeNum = parseFloat(change);
-        const isValid = !isNaN(changeNum);
-
-        let arrow = "";
-        let formattedChange = "--";
-
-        let statusClass = "neutral";
-
-        if (isValid) {
-          statusClass = changeNum >= 0 ? "up" : "down";
-          const isUp = changeNum >= 0;
-
-          // color = isUp ? "text-green-400" : "text-red-400";
-          // bg = isUp ? "bg-green-500/10" : "bg-red-500/10";
-          arrow = isUp ? "▲" : "▼";
-          formattedChange = `${isUp ? "+" : ""}${(changeNum * 100).toFixed(2)}%`;
+        // Initialize base price if missing
+        if (!basePrices[ticker]) {
+          basePrices[ticker] = currentPrice;
+          saveBasePrices(basePrices);
         }
+
+        const basePrice = basePrices[ticker];
+
+        // Calculate change
+        const changeNum = (currentPrice - basePrice) / basePrice;
+        const isUp = changeNum >= 0;
+
+        const arrow = isUp ? "▲" : "▼";
+        const formattedChange = `${isUp ? "+" : ""}${(changeNum * 100).toFixed(2)}%`;
+
+        let statusClass = isUp ? "up" : "down";
 
         container.innerHTML += `
           <div class="stock ${statusClass}">
@@ -70,6 +80,18 @@
 
     loadStocks();
     setInterval(loadStocks, 90000); // refresh every 90 sec
+
+    function getToday() {
+      return new Date().toISOString().split("T")[0];
+    }
+
+    function getBasePrices() {
+      return JSON.parse(localStorage.getItem("stockBase")) || {};
+    }
+
+    function saveBasePrices(data) {
+      localStorage.setItem("stockBase", JSON.stringify(data));
+    }
   </script>
 
 </body>
