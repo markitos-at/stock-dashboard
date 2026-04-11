@@ -93,6 +93,8 @@ function renderOptions(ticker, currentPrice) {
 
         // distance to strike
         const distance = ((strike - currentPrice) / currentPrice) * 100;
+        // add + for positive distance for consistency
+        const formattedDistance = `${distance >= 0 ? "+" : ""}${distance.toFixed(1)}%`; 
 
         html += `
       <div class="option ${statusClass}">
@@ -101,7 +103,7 @@ function renderOptions(ticker, currentPrice) {
           <span class="expiry">(${expiry})</span>
         </div>
         <div class="meta">
-          ${label} | ${distance.toFixed(1)}%
+          ${label} | ${formattedDistance}
         </div>
       </div>
     `;
