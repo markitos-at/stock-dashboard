@@ -26,121 +26,209 @@ function saveCache(data) {
 }
 
 // ------------------------
-// Main loading function
+// Options storage
 // ------------------------
-async function loadStocks() {
-  const container = document.getElementById("stocks");
+function getOptions() {
+    return JSON.parse(localStorage.getItem("stockOptions")) || {};
+}
 
-  let rowsText = "";
-  let isLive = true;
+function saveOptions(data) {
+    localStorage.setItem("stockOptions", JSON.stringify(data));
+}
 
-  try {
-    const res = await fetch(SHEET_URL);
-    rowsText = await res.text();
+function addOption(ticker, type, strike, expiry) {
+    const options = getOptions();
 
-    // ------------------------
-    // Build cache from live data
-    // ------------------------
-    const cache = {};
-    const rows = rowsText.split("\n").slice(1);
+    ticker = ticker.toUpperCase();
 
-    rows.forEach(row => {
-      if (!row) return;
+    if (!options[ticker]) {
+        options[ticker] = [];
+    }
 
-      const [ticker, price] = row.split(",");
-      const numPrice = parseFloat(price);
-
-      if (!isNaN(numPrice)) {
-        cache[ticker] = numPrice;
-      }
+    options[ticker].push({
+        type,
+        strike: parseFloat(strike),
+        expiry
     });
 
-    saveCache(cache);
-    console.log("liveData.loaded");
-  } catch (err) {
-    console.log("fetchFailed.usingCache");
-    isLive = false;
+    saveOptions(options);
+}
 
-    const cached = getCache();
+// ------------------------
+// Options UI - Render options per Ticker
+// ------------------------
+function renderOptions(ticker, currentPrice) {
+    const options = getOptions();
+    const stockOptions = options[ticker];
 
-    if (!cached || Object.keys(cached).length === 0) {
-      container.innerHTML = "⚠️ No data available";
-      return;
-    }
+    if (!stockOptions || stockOptions.length === 0) return "";
 
-    // rebuild fake rows from cache
-    rowsText = Object.entries(cached)
-      .map(([ticker, price]) => `${ticker},${price}`)
-      .join("\n");
-  }
+    let html = `<div class="options">`;
 
+    stockOptions.forEach(opt => {
+        const { type, strike, expiry } = opt;
 
-  // ------------------------
-  // Base price logic (daily reset)
-  // ------------------------
-  const today = getToday();
-  const storedDate = localStorage.getItem("stockDate");
+        let statusClass = "neutral";
+        let label = "";
 
-  let basePrices = getBasePrices();
+        if (type === "CALL") {
+            if (currentPrice > strike) {
+                statusClass = "danger";
+                label = "ITM";
+            } else {
+                statusClass = "safe";
+                label = "OTM";
+            }
+        }
 
-  if (storedDate !== today) {
-    basePrices = {};
-    localStorage.setItem("stockDate", today);
-  }
+        if (type === "PUT") {
+            if (currentPrice < strike) {
+                statusClass = "danger";
+                label = "ITM";
+            } else {
+                statusClass = "safe";
+                label = "OTM";
+            }
+        }
 
+        // distance to strike
+        const distance = ((strike - currentPrice) / currentPrice) * 100;
 
-  // ------------------------
-  // Render UI
-  // ------------------------
-  const rows = rowsText.split("\n").slice(0);
-  container.innerHTML = "";
-
-  rows.forEach(row => {
-    if (!row) return;
-
-    const [ticker, price] = row.split(",");
-    const currentPrice = parseFloat(price);
-
-    if (isNaN(currentPrice)) return;
-
-    // set base price if missing
-    if (!basePrices[ticker]) {
-      basePrices[ticker] = currentPrice;
-    }
-
-    const basePrice = basePrices[ticker];
-
-    const changeNum = (currentPrice - basePrice) / basePrice;
-    const isUp = changeNum >= 0;
-
-    const arrow = isUp ? "▲" : "▼";
-    const formattedChange =
-      `${isUp ? "+" : ""}${(changeNum * 100).toFixed(2)}%`;
-
-    const statusClass = isUp ? "up" : "down";
-
-    // ------------------------
-    // html output
-    // ------------------------
-    container.innerHTML += `
-      <div class="stock ${statusClass}">
+        html += `
+      <div class="option ${statusClass}">
         <div>
-          <div class="ticker">${ticker}</div>
-          <div class="change ${statusClass}">
-            ${arrow} ${formattedChange}
-          </div>
+          ${type} ${strike}
+          <span class="expiry">(${expiry})</span>
         </div>
-
-        <div class="price">
-          $${currentPrice.toFixed(2)}
+        <div class="meta">
+          ${label} | ${distance.toFixed(1)}%
         </div>
       </div>
     `;
-  });
+    });
 
-  saveBasePrices(basePrices);
+    html += `</div>`;
 
-  console.log(isLive ? "LIVEdata.rendered" : "CACHEdata.rendered");
+    return html;
+}
+
+// ------------------------
+// Main loading function
+// ------------------------
+async function loadStocks() {
+    const container = document.getElementById("stocks");
+
+    let rowsText = "";
+    let isLive = true;
+
+    try {
+        const res = await fetch(SHEET_URL);
+        rowsText = await res.text();
+
+        // ------------------------
+        // Build cache from live data
+        // ------------------------
+        const cache = {};
+        const rows = rowsText.split("\n").slice(1);
+
+        rows.forEach(row => {
+            if (!row) return;
+
+            const [ticker, price] = row.split(",");
+            const numPrice = parseFloat(price);
+
+            if (!isNaN(numPrice)) {
+                cache[ticker] = numPrice;
+            }
+        });
+
+        saveCache(cache);
+        console.log("liveData.loaded");
+    } catch (err) {
+        console.log("fetchFailed.usingCache");
+        isLive = false;
+
+        const cached = getCache();
+
+        if (!cached || Object.keys(cached).length === 0) {
+            container.innerHTML = "⚠️ No data available";
+            return;
+        }
+
+        // rebuild fake rows from cache
+        rowsText = Object.entries(cached)
+            .map(([ticker, price]) => `${ticker},${price}`)
+            .join("\n");
+    }
+
+
+    // ------------------------
+    // Base price logic (daily reset)
+    // ------------------------
+    const today = getToday();
+    const storedDate = localStorage.getItem("stockDate");
+
+    let basePrices = getBasePrices();
+
+    if (storedDate !== today) {
+        basePrices = {};
+        localStorage.setItem("stockDate", today);
+    }
+
+    // ------------------------
+    // Render UI
+    // ------------------------
+    const rows = rowsText.split("\n").slice(0);
+    container.innerHTML = "";
+
+    rows.forEach(row => {
+        if (!row) return;
+
+        const [ticker, price] = row.split(",");
+        const currentPrice = parseFloat(price);
+
+        if (isNaN(currentPrice)) return;
+
+        // set base price if missing
+        if (!basePrices[ticker]) {
+            basePrices[ticker] = currentPrice;
+        }
+
+        const basePrice = basePrices[ticker];
+
+        const changeNum = (currentPrice - basePrice) / basePrice;
+        const isUp = changeNum >= 0;
+
+        const arrow = isUp ? "▲" : "▼";
+        const formattedChange =
+            `${isUp ? "+" : ""}${(changeNum * 100).toFixed(2)}%`;
+
+        const statusClass = isUp ? "up" : "down";
+
+        // ------------------------
+        // html output
+        // ------------------------
+        container.innerHTML += `
+        <div class="stock ${statusClass}">
+            <div>
+            <div class="ticker">${ticker}</div>
+            <div class="change ${statusClass}">
+                ${arrow} ${formattedChange}
+            </div>
+            </div>
+
+            <div class="price">
+            $${currentPrice.toFixed(2)}
+            </div>
+        </div>
+
+        ${renderOptions(ticker, currentPrice)}
+        `;
+    });
+
+    saveBasePrices(basePrices);
+
+    console.log(isLive ? "LIVEdata.rendered" : "CACHEdata.rendered");
 }
 
 // ------------------------

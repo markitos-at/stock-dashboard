@@ -1,5 +1,5 @@
 body {
-    margin: 0; 
+    margin: 0;
     font-family: Arial, sans-serif;
     background: #111827;
     display: flex;
@@ -20,7 +20,7 @@ body {
 }
 
 h1 {
-    text-align: center; 
+    text-align: center;
     margin-bottom: 20px;
 }
 
@@ -72,4 +72,40 @@ h1 {
 
 .text-center {
     text-align: center;
+}
+
+// Options styling
+.options {
+    margin-top: -10px;
+    margin-bottom: 16px;
+    padding-left: 10px;
+}
+
+.option {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    margin-top: 4px;
+    background: #111827;
+
+    &.safe {
+        color: #4ade80;
+    }
+
+    &.danger {
+        color: #f87171;
+    }
+}
+
+.expiry {
+    opacity: 0.6;
+    font-size: 12px;
+    margin-left: 6px;
+}
+
+.meta {
+    font-size: 12px;
+    opacity: 0.8;
 }
