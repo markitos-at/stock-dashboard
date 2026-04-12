@@ -16,7 +16,7 @@ body {
 #stocks {
     // this is the div containing all the stocks
     max-width: 500px;
-    margin: 0 auto; // teest
+    margin: 0 auto;
 }
 
 h1 {
@@ -108,4 +108,50 @@ h1 {
 .meta {
     font-size: 12px;
     opacity: 0.8;
+}
+
+// ------------------------
+// Options form styling
+// ------------------------
+.toggle-btn {
+  width: 100%;
+  max-width: 500px;
+  margin: 60px auto 10px;
+  display: block;
+  padding: 12px;
+  border-radius: 10px;
+  background: #1f2937;
+  color: white;
+  border: none;
+  font-size: 16px;
+}
+
+.option-form {
+  max-width: 500px;
+  margin: 0 auto 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-form input,
+.option-form select {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #111827;
+  color: white;
+}
+
+.option-form button {
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #4ade80;
+  color: black;
+  font-weight: bold;
+}
+
+.hidden {
+  display: none;
 }

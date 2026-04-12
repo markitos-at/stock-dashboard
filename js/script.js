@@ -94,18 +94,18 @@ function renderOptions(ticker, currentPrice) {
         // distance to strike
         const distance = ((strike - currentPrice) / currentPrice) * 100;
         // add + for positive distance for consistency
-        const formattedDistance = `${distance >= 0 ? "+" : ""}${distance.toFixed(1)}%`; 
+        const formattedDistance = `${distance >= 0 ? "+" : ""}${distance.toFixed(1)}%`;
 
         html += `
-      <div class="option ${statusClass}">
-        <div>
-          ${type} ${strike}
-          <span class="expiry">(${expiry})</span>
+        <div class="option ${statusClass}">
+            <div>
+            ${type} ${strike}
+            <span class="expiry">(${expiry})</span>
+            </div>
+            <div class="meta">
+            ${label} | ${formattedDistance}
+            </div>
         </div>
-        <div class="meta">
-          ${label} | ${formattedDistance}
-        </div>
-      </div>
     `;
     });
 
@@ -239,3 +239,46 @@ async function loadStocks() {
 loadStocks();
 setInterval(loadStocks, 90000); // 90 sec
 
+
+
+// ------------------------
+// Form logic
+// ------------------------
+const form = document.getElementById("optionForm");
+const toggleBtn = document.getElementById("toggleFormBtn");
+
+toggleBtn.addEventListener("click", () => {
+    form.classList.toggle("hidden");
+
+    if (!form.classList.contains("hidden")) {
+        // focus first form element
+        document.getElementById("tickerInput").focus();
+    }
+});
+
+form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    let ticker = document.getElementById("tickerInput").value.trim().toUpperCase();
+    const type = document.getElementById("typeInput").value;
+    const strike = document.getElementById("strikeInput").value;
+    const expiry = document.getElementById("expiryInput").value;
+
+    if (!ticker || !strike) return;
+
+    addOption(ticker, type, strike, expiry);
+
+    // reset form
+    form.reset();
+
+    // hide form again (optional UX)
+    form.classList.add("hidden");
+
+    // re-render UI
+    loadStocks();
+});
+
+tickerInput.addEventListener("input", (e) => {
+    // make sure input is capital letters
+    e.target.value = e.target.value.toUpperCase();
+});
