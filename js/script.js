@@ -261,10 +261,30 @@ form.addEventListener("submit", (e) => {
 
     let ticker = document.getElementById("tickerInput").value.trim().toUpperCase();
     const type = document.getElementById("typeInput").value;
-    const strike = document.getElementById("strikeInput").value;
-    const expiry = document.getElementById("expiryInput").value;
+    const strike = parseFloat(document.getElementById("strikeInput").value);
+    const expiryRaw = document.getElementById("expiryInput").value.trim();
+    const expiry = escapeHTML(expiryRaw).substring(0, 20);
 
-    if (!ticker || !strike) return;
+    if (!ticker || !strike) {
+        alert("Ticker and strike required");
+        return;
+    }
+
+    if (!ticker.match(/^[A-Z]{1,5}$/)) {
+        alert("Invalid ticker");
+        return;
+    }
+
+    const cache = getCache();
+    if (!cache[ticker]) {
+        alert("Ticker not in your list");
+        return;
+    }
+
+    if (isNaN(strike) || strike < 1 || strike > 10000) {
+        alert("Invalid strike");
+        return;
+    }
 
     addOption(ticker, type, strike, expiry);
 
