@@ -56,7 +56,7 @@ function addOption(ticker, type, strike, expiry) {
 
 function deleteOption(ticker, index) {
     //if (!confirm("Delete this option?")) return;
-    
+
     const options = getOptions();
 
     if (!options[ticker]) return;
@@ -77,89 +77,96 @@ function deleteOption(ticker, index) {
 // ------------------------
 // Options UI - Render options per Ticker
 // ------------------------
-function renderOptions(ticker, currentPrice) {
-    const options = getOptions();
-    const stockOptions = options[ticker];
+function renderOptionsElement(ticker, currentPrice) {
+  const options = getOptions();
+  const stockOptions = options[ticker];
 
-    if (!stockOptions || stockOptions.length === 0) return "";
+  if (!stockOptions || stockOptions.length === 0) return null;
 
-    let html = `<div class="options">`;
+  const wrapper = document.createElement("div");
+  wrapper.className = "options";
 
-    stockOptions.forEach((opt, index) => {
-        const { type, strike, expiry } = opt;
+  stockOptions.forEach((opt, index) => {
+    const { type, strike, expiry } = opt;
 
-        let statusClass = "neutral";
-        let label = "";
+    let statusClass = "neutral";
+    let label = "";
 
-        if (type === "CALL") {
-            if (currentPrice > strike) {
-                statusClass = "danger";
-                label = "ITM";
-            } else {
-                statusClass = "safe";
-                label = "OTM";
-            }
-        }
+    if (type === "CALL") {
+      statusClass = currentPrice > strike ? "danger" : "safe";
+      label = currentPrice > strike ? "ITM" : "OTM";
+    }
 
-        if (type === "PUT") {
-            if (currentPrice < strike) {
-                statusClass = "danger";
-                label = "ITM";
-            } else {
-                statusClass = "safe";
-                label = "OTM";
-            }
-        }
+    if (type === "PUT") {
+      statusClass = currentPrice < strike ? "danger" : "safe";
+      label = currentPrice < strike ? "ITM" : "OTM";
+    }
 
-        // distance to strike
-        const distance = ((strike - currentPrice) / currentPrice) * 100;
-        // add + for positive distance for consistency
-        const formattedDistance = `${distance >= 0 ? "+" : ""}${distance.toFixed(1)}%`;
+    const distance = ((strike - currentPrice) / currentPrice) * 100;
+    const formattedDistance =
+      `${distance >= 0 ? "+" : ""}${distance.toFixed(1)}%`;
 
-        html += `
-        <div class="option ${statusClass}">
-            <div>
-            ${type} ${strike}
-            <span class="expiry">(${expiry})</span>
-            </div>
-            <div class="meta">
-            ${label} | ${formattedDistance}
-            </div>
-            <button class="delete-btn" onclick="deleteOption('${ticker}', ${index})">
-            ✕
-            </button>
-        </div>
-    `;
+    // ------------------------
+    // Option element
+    // ------------------------
+
+    const optionEl = document.createElement("div");
+    optionEl.className = `option ${statusClass}`;
+
+    const left = document.createElement("div");
+    left.textContent = `${type} ${strike}`;
+
+    const expiryEl = document.createElement("span");
+    expiryEl.className = "expiry";
+    expiryEl.textContent = ` (${expiry})`;
+
+    left.appendChild(expiryEl);
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = `${label} | ${formattedDistance}`;
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-btn";
+    deleteBtn.textContent = "✕";
+
+    deleteBtn.addEventListener("click", () => {
+      deleteOption(ticker, index);
     });
 
-    html += `</div>`;
+    optionEl.appendChild(left);
+    optionEl.appendChild(meta);
+    optionEl.appendChild(deleteBtn);
 
-    return html;
+    wrapper.appendChild(optionEl);
+  });
+
+  return wrapper;
 }
 
 // ------------------------
 // Status display function
 // ------------------------
 function updateStatus(type) {
-  const statusEl = document.querySelector("#statusBar .status");
+    const statusEl = document.querySelector("#statusBar .status");
 
-  // reset classes
-  statusEl.classList.remove("live", "cache", "error");
+    // reset classes
+    statusEl.classList.remove("live", "cache", "error");
 
-  if (type === "live") {
-    statusEl.textContent = "Live data";
-    statusEl.classList.add("live");
-  }
+    if (type === "live") {
+        statusEl.textContent = "Live data";
+        statusEl.classList.add("live");
+    }
 
-  if (type === "cache") {
-    statusEl.textContent = "Cached data (offline)";
-    statusEl.classList.add("cache");
-  }
+    if (type === "cache") {
+        statusEl.textContent = "Cached data (offline)";
+        statusEl.classList.add("cache");
+    }
 
-  if (type === "error") {
-    statusEl.textContent = "No data available";
-    statusEl.classList.add("error");
-  }
+    if (type === "error") {
+        statusEl.textContent = "No data available";
+        statusEl.classList.add("error");
+    }
 }
 
 // ------------------------
@@ -196,7 +203,6 @@ async function loadStocks() {
         updateStatus("live");
         console.log("liveData.loaded");
     } catch (err) {
-        console.log("fetchFailed.usingCache");
         isLive = false;
 
         const cached = getCache();
@@ -209,8 +215,8 @@ async function loadStocks() {
 
         // rebuild rows from cache
         rowsText = Object.entries(cached)
-        .map(([ticker, price]) => `${ticker},${price}`)
-        .join("\n");
+            .map(([ticker, price]) => `${ticker},${price}`)
+            .join("\n");
 
         updateStatus("cache");
     }
@@ -243,7 +249,7 @@ async function loadStocks() {
 
         if (isNaN(currentPrice)) return;
 
-        // set base price if missing
+        // base price
         if (!basePrices[ticker]) {
             basePrices[ticker] = currentPrice;
         }
@@ -260,29 +266,46 @@ async function loadStocks() {
         const statusClass = isUp ? "up" : "down";
 
         // ------------------------
-        // html output
+        // Create STOCK element
         // ------------------------
-        container.innerHTML += `
-        <div class="stock ${statusClass}">
-            <div>
-            <div class="ticker">${ticker}</div>
-            <div class="change ${statusClass}">
-                ${arrow} ${formattedChange}
-            </div>
-            </div>
 
-            <div class="price">
-            $${currentPrice.toFixed(2)}
-            </div>
-        </div>
+        const stockEl = document.createElement("div");
+        stockEl.className = `stock ${statusClass}`;
 
-        ${renderOptions(ticker, currentPrice)}
-        `;
+        const left = document.createElement("div");
+
+        const tickerEl = document.createElement("div");
+        tickerEl.className = "ticker";
+        tickerEl.textContent = ticker;
+
+        const changeEl = document.createElement("div");
+        changeEl.className = `change ${statusClass}`;
+        changeEl.textContent = `${arrow} ${formattedChange}`;
+
+        left.appendChild(tickerEl);
+        left.appendChild(changeEl);
+
+        const priceEl = document.createElement("div");
+        priceEl.className = "price";
+        priceEl.textContent = `$${currentPrice.toFixed(2)}`;
+
+        stockEl.appendChild(left);
+        stockEl.appendChild(priceEl);
+
+        container.appendChild(stockEl);
+
+        // ------------------------
+        // Append OPTIONS
+        // ------------------------
+
+        const optionsEl = renderOptionsElement(ticker, currentPrice);
+
+        if (optionsEl) {
+            container.appendChild(optionsEl);
+        }
     });
 
     saveBasePrices(basePrices);
-
-    console.log(isLive ? "Livedata.rendered" : "cachedata.rendered");
 }
 
 // ------------------------
