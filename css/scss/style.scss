@@ -64,8 +64,9 @@ h1 {
     color: #4ade80;
 }
 
-
+// ------------------------
 // General attributes
+// ------------------------
 .text-white {
     color: white;
 }
@@ -74,7 +75,9 @@ h1 {
     text-align: center;
 }
 
+// ------------------------
 // Options styling
+// ------------------------
 .options {
     margin-top: -10px;
     margin-bottom: 16px;
@@ -83,12 +86,34 @@ h1 {
 
 .option {
     display: flex;
+    position: relative;
     justify-content: space-between;
     font-size: 14px;
     padding: 6px 10px;
     border-radius: 8px;
     margin-top: 4px;
     background: #111827;
+
+    .delete-btn {
+        position: absolute;
+        right: 6px;
+        top: 3px;
+        background: transparent;
+        border: none;
+        color: #9ca3af;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .delete-btn:hover {
+        color: #f87171;
+    }
+
+    .meta {
+        font-size: 12px;
+        opacity: 0.8;
+        padding-right: 20px;
+    }
 
     &.safe {
         color: #4ade80;
@@ -105,53 +130,82 @@ h1 {
     margin-left: 6px;
 }
 
-.meta {
-    font-size: 12px;
-    opacity: 0.8;
-}
 
 // ------------------------
 // Options form styling
 // ------------------------
 .toggle-btn {
-  width: 100%;
-  max-width: 500px;
-  margin: 60px auto 10px;
-  display: block;
-  padding: 12px;
-  border-radius: 10px;
-  background: #1f2937;
-  color: white;
-  border: none;
-  font-size: 16px;
+    width: 100%;
+    max-width: 500px;
+    margin: 60px auto 10px;
+    display: block;
+    padding: 12px;
+    border-radius: 10px;
+    background: #1f2937;
+    color: white;
+    border: none;
+    font-size: 16px;
 }
 
 .option-form {
-  max-width: 500px;
-  margin: 0 auto 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+    max-width: 500px;
+    margin: 0 auto 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .option-form input,
 .option-form select {
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  background: #111827;
-  color: white;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background: #111827;
+    color: white;
 }
 
 .option-form button {
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  background: #4ade80;
-  color: black;
-  font-weight: bold;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #4ade80;
+    color: black;
+    font-weight: bold;
 }
 
 .hidden {
-  display: none;
+    display: none;
+}
+
+
+// ------------------------
+// Footer Status bar
+// ------------------------
+.status-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    padding: 8px 0;
+
+    background: #1f2937;
+    color: #9ca3af;
+    font-size: 12px;
+
+    border-top: 1px solid #374151;
+
+    .status {
+        &.live {
+            color: #4ade80;
+        }
+
+        &.cache {
+            color: #fbbf24;
+        }
+
+        &.error {
+            color: #f87171;
+        }
+    }
 }

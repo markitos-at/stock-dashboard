@@ -76,12 +76,31 @@ h1 {
 
 .option {
   display: flex;
+  position: relative;
   justify-content: space-between;
   font-size: 14px;
   padding: 6px 10px;
   border-radius: 8px;
   margin-top: 4px;
   background: #111827;
+}
+.option .delete-btn {
+  position: absolute;
+  right: 6px;
+  top: 3px;
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 14px;
+  cursor: pointer;
+}
+.option .delete-btn:hover {
+  color: #f87171;
+}
+.option .meta {
+  font-size: 12px;
+  opacity: 0.8;
+  padding-right: 20px;
 }
 .option.safe {
   color: #4ade80;
@@ -94,11 +113,6 @@ h1 {
   opacity: 0.6;
   font-size: 12px;
   margin-left: 6px;
-}
-
-.meta {
-  font-size: 12px;
-  opacity: 0.8;
 }
 
 .toggle-btn {
@@ -142,4 +156,25 @@ h1 {
 
 .hidden {
   display: none;
+}
+
+.status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 8px 0;
+  background: #1f2937;
+  color: #9ca3af;
+  font-size: 12px;
+  border-top: 1px solid #374151;
+}
+.status-bar .status.live {
+  color: #4ade80;
+}
+.status-bar .status.cache {
+  color: #fbbf24;
+}
+.status-bar .status.error {
+  color: #f87171;
 }

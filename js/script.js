@@ -54,6 +54,26 @@ function addOption(ticker, type, strike, expiry) {
     saveOptions(options);
 }
 
+function deleteOption(ticker, index) {
+    //if (!confirm("Delete this option?")) return;
+    
+    const options = getOptions();
+
+    if (!options[ticker]) return;
+
+    options[ticker].splice(index, 1);
+
+    // clean up empty arrays
+    if (options[ticker].length === 0) {
+        delete options[ticker];
+    }
+
+    saveOptions(options);
+
+    loadStocks(); // re-render
+}
+
+
 // ------------------------
 // Options UI - Render options per Ticker
 // ------------------------
@@ -65,7 +85,7 @@ function renderOptions(ticker, currentPrice) {
 
     let html = `<div class="options">`;
 
-    stockOptions.forEach(opt => {
+    stockOptions.forEach((opt, index) => {
         const { type, strike, expiry } = opt;
 
         let statusClass = "neutral";
@@ -105,6 +125,9 @@ function renderOptions(ticker, currentPrice) {
             <div class="meta">
             ${label} | ${formattedDistance}
             </div>
+            <button class="delete-btn" onclick="deleteOption('${ticker}', ${index})">
+            ✕
+            </button>
         </div>
     `;
     });
@@ -112,6 +135,31 @@ function renderOptions(ticker, currentPrice) {
     html += `</div>`;
 
     return html;
+}
+
+// ------------------------
+// Status display function
+// ------------------------
+function updateStatus(type) {
+  const statusEl = document.querySelector("#statusBar .status");
+
+  // reset classes
+  statusEl.classList.remove("live", "cache", "error");
+
+  if (type === "live") {
+    statusEl.textContent = "Live data";
+    statusEl.classList.add("live");
+  }
+
+  if (type === "cache") {
+    statusEl.textContent = "Cached data (offline)";
+    statusEl.classList.add("cache");
+  }
+
+  if (type === "error") {
+    statusEl.textContent = "No data available";
+    statusEl.classList.add("error");
+  }
 }
 
 // ------------------------
@@ -145,6 +193,7 @@ async function loadStocks() {
         });
 
         saveCache(cache);
+        updateStatus("live");
         console.log("liveData.loaded");
     } catch (err) {
         console.log("fetchFailed.usingCache");
@@ -154,13 +203,16 @@ async function loadStocks() {
 
         if (!cached || Object.keys(cached).length === 0) {
             container.innerHTML = "⚠️ No data available";
+            updateStatus("error");
             return;
         }
 
-        // rebuild fake rows from cache
+        // rebuild rows from cache
         rowsText = Object.entries(cached)
-            .map(([ticker, price]) => `${ticker},${price}`)
-            .join("\n");
+        .map(([ticker, price]) => `${ticker},${price}`)
+        .join("\n");
+
+        updateStatus("cache");
     }
 
 
@@ -230,7 +282,7 @@ async function loadStocks() {
 
     saveBasePrices(basePrices);
 
-    console.log(isLive ? "LIVEdata.rendered" : "CACHEdata.rendered");
+    console.log(isLive ? "Livedata.rendered" : "cachedata.rendered");
 }
 
 // ------------------------
@@ -302,3 +354,9 @@ tickerInput.addEventListener("input", (e) => {
     // make sure input is capital letters
     e.target.value = e.target.value.toUpperCase();
 });
+
+function escapeHTML(str) {
+    const p = document.createElement('p');
+    p.textContent = str;
+    return p.innerHTML;
+}

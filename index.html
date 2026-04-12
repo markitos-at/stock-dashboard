@@ -27,13 +27,16 @@
         <option value="PUT">PUT</option>
       </select>
 
-      <input type="number" id="strikeInput" placeholder="Strike"  min="10" max="1000" required />
+      <input type="number" id="strikeInput" placeholder="Strike" min="10" max="1000" required />
 
       <input type="text" id="expiryInput" placeholder="Expiry (e.g. 17.8.)" />
 
       <button type="submit">Save</button>
     </form>
   </div>
+  <footer id="statusBar" class="status-bar text-center">
+    Status: <span class="status">Loading...</span>
+  </footer>
 </body>
 
 </html>
