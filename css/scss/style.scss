@@ -75,6 +75,14 @@ h1 {
     text-align: center;
 }
 
+.position-relative {
+    position: relative;
+}
+
+.hidden {
+    display: none !important;
+}
+
 // ------------------------
 // Options styling
 // ------------------------
@@ -162,6 +170,7 @@ h1 {
     border: none;
     background: #111827;
     color: white;
+    border: 1px solid #374151;
 }
 
 .option-form button {
@@ -173,10 +182,68 @@ h1 {
     font-weight: bold;
 }
 
-.hidden {
-    display: none;
+.action-buttons {
+    max-width: 500px;
+    margin: 20px auto 25px;
+    display: flex;
+    gap: 10px;
+
+    button {
+        flex: 1;
+    }
 }
 
+// ------------------------
+// Import export area
+// ------------------------
+.import-export {
+    max-width: 500px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    textarea {
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 80px;
+        padding: 10px;
+        padding-right: 40px; // space for button
+        border-radius: 8px;
+        background: #111827;
+        color: white;
+        border: none;
+        font-size: 12px;
+        border: 1px solid #374151;
+    }
+
+    button {
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        background: #4ade80;
+        color: black;
+    }
+
+    #copyBtn {
+        position: absolute;
+        right: 8px;
+        top: 8px;
+
+        background: #374151;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 4px 6px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .import-title {
+        padding-top: 20px;
+    }
+}
 
 // ------------------------
 // Footer Status bar

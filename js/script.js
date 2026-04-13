@@ -78,70 +78,70 @@ function deleteOption(ticker, index) {
 // Options UI - Render options per Ticker
 // ------------------------
 function renderOptionsElement(ticker, currentPrice) {
-  const options = getOptions();
-  const stockOptions = options[ticker];
+    const options = getOptions();
+    const stockOptions = options[ticker];
 
-  if (!stockOptions || stockOptions.length === 0) return null;
+    if (!stockOptions || stockOptions.length === 0) return null;
 
-  const wrapper = document.createElement("div");
-  wrapper.className = "options";
+    const wrapper = document.createElement("div");
+    wrapper.className = "options";
 
-  stockOptions.forEach((opt, index) => {
-    const { type, strike, expiry } = opt;
+    stockOptions.forEach((opt, index) => {
+        const { type, strike, expiry } = opt;
 
-    let statusClass = "neutral";
-    let label = "";
+        let statusClass = "neutral";
+        let label = "";
 
-    if (type === "CALL") {
-      statusClass = currentPrice > strike ? "danger" : "safe";
-      label = currentPrice > strike ? "ITM" : "OTM";
-    }
+        if (type === "CALL") {
+            statusClass = currentPrice > strike ? "danger" : "safe";
+            label = currentPrice > strike ? "ITM" : "OTM";
+        }
 
-    if (type === "PUT") {
-      statusClass = currentPrice < strike ? "danger" : "safe";
-      label = currentPrice < strike ? "ITM" : "OTM";
-    }
+        if (type === "PUT") {
+            statusClass = currentPrice < strike ? "danger" : "safe";
+            label = currentPrice < strike ? "ITM" : "OTM";
+        }
 
-    const distance = ((strike - currentPrice) / currentPrice) * 100;
-    const formattedDistance =
-      `${distance >= 0 ? "+" : ""}${distance.toFixed(1)}%`;
+        const distance = ((strike - currentPrice) / currentPrice) * 100;
+        const formattedDistance =
+            `${distance >= 0 ? "+" : ""}${distance.toFixed(1)}%`;
 
-    // ------------------------
-    // Option element
-    // ------------------------
+        // ------------------------
+        // Option element
+        // ------------------------
 
-    const optionEl = document.createElement("div");
-    optionEl.className = `option ${statusClass}`;
+        const optionEl = document.createElement("div");
+        optionEl.className = `option ${statusClass}`;
 
-    const left = document.createElement("div");
-    left.textContent = `${type} ${strike}`;
+        const left = document.createElement("div");
+        left.textContent = `${type} ${strike}`;
 
-    const expiryEl = document.createElement("span");
-    expiryEl.className = "expiry";
-    expiryEl.textContent = ` (${expiry})`;
+        const expiryEl = document.createElement("span");
+        expiryEl.className = "expiry";
+        expiryEl.textContent = ` (${expiry})`;
 
-    left.appendChild(expiryEl);
+        left.appendChild(expiryEl);
 
-    const meta = document.createElement("div");
-    meta.className = "meta";
-    meta.textContent = `${label} | ${formattedDistance}`;
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = `${label} | ${formattedDistance}`;
 
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "delete-btn";
-    deleteBtn.textContent = "✕";
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete-btn";
+        deleteBtn.textContent = "✕";
 
-    deleteBtn.addEventListener("click", () => {
-      deleteOption(ticker, index);
+        deleteBtn.addEventListener("click", () => {
+            deleteOption(ticker, index);
+        });
+
+        optionEl.appendChild(left);
+        optionEl.appendChild(meta);
+        optionEl.appendChild(deleteBtn);
+
+        wrapper.appendChild(optionEl);
     });
 
-    optionEl.appendChild(left);
-    optionEl.appendChild(meta);
-    optionEl.appendChild(deleteBtn);
-
-    wrapper.appendChild(optionEl);
-  });
-
-  return wrapper;
+    return wrapper;
 }
 
 // ------------------------
@@ -320,16 +320,6 @@ setInterval(loadStocks, 90000); // 90 sec
 // Form logic
 // ------------------------
 const form = document.getElementById("optionForm");
-const toggleBtn = document.getElementById("toggleFormBtn");
-
-toggleBtn.addEventListener("click", () => {
-    form.classList.toggle("hidden");
-
-    if (!form.classList.contains("hidden")) {
-        // focus first form element
-        document.getElementById("tickerInput").focus();
-    }
-});
 
 form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -378,8 +368,117 @@ tickerInput.addEventListener("input", (e) => {
     e.target.value = e.target.value.toUpperCase();
 });
 
+// ------------------------
+// Helper function
+// ------------------------
 function escapeHTML(str) {
     const p = document.createElement('p');
     p.textContent = str;
     return p.innerHTML;
 }
+
+function scrollToSection(el) {
+    el.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
+// ------------------------
+// Import Export functionality
+// ------------------------
+document.getElementById("exportBtn").addEventListener("click", () => {
+    const options = getOptions();
+
+    const json = JSON.stringify(options, null, 2);
+
+    document.getElementById("exportOutput").value = json;
+});
+
+document.getElementById("copyBtn").addEventListener("click", () => {
+    const textarea = document.getElementById("exportOutput");
+
+    textarea.select();
+    document.execCommand("copy");
+
+    alert("Copied!");
+});
+
+document.getElementById("importBtn").addEventListener("click", () => {
+    const input = document.getElementById("importInput").value.trim();
+
+    if (!input) return;
+
+    try {
+        const parsed = JSON.parse(input);
+
+        // basic validation
+        if (typeof parsed !== "object") {
+            throw new Error("Invalid format");
+        }
+
+        // sanitize values
+        for (const ticker in parsed) {
+            parsed[ticker] = parsed[ticker].map(opt => ({
+                type: opt.type,
+                strike: parseFloat(opt.strike),
+                expiry: escapeHTML(String(opt.expiry || ""))
+            }));
+        }
+
+        localStorage.setItem("stockOptions", JSON.stringify(parsed));
+
+        alert("Import successful!");
+
+        loadStocks();
+
+    } catch (err) {
+        alert("Invalid JSON format");
+        console.error(err);
+    }
+});
+
+const importExportSection = document.getElementById("importExportSection");
+const toggleImportExportBtn = document.getElementById("toggleImportExportBtn");
+
+// existing form refs
+const formAddOpt = document.getElementById("sectionAddOption");
+const toggleFormBtn = document.getElementById("toggleFormBtn");
+
+
+// Toggle Add Option
+toggleFormBtn.addEventListener("click", () => {
+    const isHidden = formAddOpt.classList.contains("hidden");
+
+    // close both first
+    formAddOpt.classList.add("hidden");
+    importExportSection.classList.add("hidden");
+
+    // then open if it was closed
+    if (isHidden) {
+        formAddOpt.classList.remove("hidden");
+
+        // scroll to AFTER display
+        setTimeout(() => {
+            scrollToSection(formAddOpt);
+            document.getElementById("tickerInput").focus();
+        }, 50);
+    }
+});
+
+
+// Toggle Import/Export
+toggleImportExportBtn.addEventListener("click", () => {
+    const isHidden = importExportSection.classList.contains("hidden");
+
+    formAddOpt.classList.add("hidden");
+    importExportSection.classList.add("hidden");
+
+    if (isHidden) {
+        importExportSection.classList.remove("hidden");
+
+        setTimeout(() => {
+            scrollToSection(importExportSection);
+        }, 50);
+    }
+});
