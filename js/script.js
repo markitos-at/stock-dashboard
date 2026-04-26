@@ -148,25 +148,31 @@ function renderOptionsElement(ticker, currentPrice) {
 // Status display function
 // ------------------------
 function updateStatus(type) {
-    const statusEl = document.querySelector("#statusBar .status");
+  const statusEl = document.querySelector("#statusBar .status");
+  const dateEl = document.querySelector("#statusBar .date");
 
-    // reset classes
-    statusEl.classList.remove("live", "cache", "error");
+  // reset classes
+  statusEl.classList.remove("live", "cache", "error");
 
-    if (type === "live") {
-        statusEl.textContent = "Live data";
-        statusEl.classList.add("live");
-    }
+  const dateStr = getFormattedDateEu();
 
-    if (type === "cache") {
-        statusEl.textContent = "Cached data (offline)";
-        statusEl.classList.add("cache");
-    }
+  if (type === "live") {
+    statusEl.textContent = "Live data";
+    statusEl.classList.add("live");
+  }
 
-    if (type === "error") {
-        statusEl.textContent = "No data available";
-        statusEl.classList.add("error");
-    }
+  if (type === "cache") {
+    statusEl.textContent = "Cached data";
+    statusEl.classList.add("cache");
+  }
+
+  if (type === "error") {
+    statusEl.textContent = "No data";
+    statusEl.classList.add("error");
+  }
+
+  // update date
+  dateEl.textContent = dateStr;
 }
 
 // ------------------------
@@ -482,3 +488,13 @@ toggleImportExportBtn.addEventListener("click", () => {
         }, 50);
     }
 });
+
+
+function getFormattedDateEu() {
+  const now = new Date();
+
+  const day = now.getDate();
+  const month = now.getMonth() + 1; // JS months start at 0
+
+  return `${day}.${month}.`;
+}

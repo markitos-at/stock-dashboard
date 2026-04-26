@@ -237,3 +237,9 @@ h1 {
 .status-bar .status.error {
   color: #f87171;
 }
+.status-bar .date {
+  opacity: 0.7;
+}
+.status-bar .separator {
+  padding: 0 4px;
+}
