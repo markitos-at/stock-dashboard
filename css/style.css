@@ -68,6 +68,10 @@ h1 {
   text-align: center;
 }
 
+.text-left {
+  text-align: left;
+}
+
 .position-relative {
   position: relative;
 }

@@ -148,31 +148,31 @@ function renderOptionsElement(ticker, currentPrice) {
 // Status display function
 // ------------------------
 function updateStatus(type) {
-  const statusEl = document.querySelector("#statusBar .status");
-  const dateEl = document.querySelector("#statusBar .date");
+    const statusEl = document.querySelector("#statusBar .status");
+    const dateEl = document.querySelector("#statusBar .date");
 
-  // reset classes
-  statusEl.classList.remove("live", "cache", "error");
+    // reset classes
+    statusEl.classList.remove("live", "cache", "error");
 
-  const dateStr = getFormattedDateEu();
+    const dateStr = getFormattedDateEu();
 
-  if (type === "live") {
-    statusEl.textContent = "Live data";
-    statusEl.classList.add("live");
-  }
+    if (type === "live") {
+        statusEl.textContent = "Live data";
+        statusEl.classList.add("live");
+    }
 
-  if (type === "cache") {
-    statusEl.textContent = "Cached data";
-    statusEl.classList.add("cache");
-  }
+    if (type === "cache") {
+        statusEl.textContent = "Cached data";
+        statusEl.classList.add("cache");
+    }
 
-  if (type === "error") {
-    statusEl.textContent = "No data";
-    statusEl.classList.add("error");
-  }
+    if (type === "error") {
+        statusEl.textContent = "No data";
+        statusEl.classList.add("error");
+    }
 
-  // update date
-  dateEl.textContent = dateStr;
+    // update date
+    dateEl.textContent = dateStr;
 }
 
 // ------------------------
@@ -263,11 +263,15 @@ async function loadStocks() {
         const basePrice = basePrices[ticker];
 
         const changeNum = (currentPrice - basePrice) / basePrice;
+        const changeDollar = currentPrice - basePrice;
         const isUp = changeNum >= 0;
 
         const arrow = isUp ? "▲" : "▼";
         const formattedChange =
-            `${isUp ? "+" : ""}${(changeNum * 100).toFixed(2)}%`;
+            (isUp ? "+" : "") + changeDollar.toFixed(2) +
+            " (" +
+            (changeNum * 100).toFixed(2) +
+            "%)";
 
         const statusClass = isUp ? "up" : "down";
 
@@ -279,6 +283,7 @@ async function loadStocks() {
         stockEl.className = `stock ${statusClass}`;
 
         const left = document.createElement("div");
+        left.classList.add("text-left");
 
         const tickerEl = document.createElement("div");
         tickerEl.className = "ticker";
@@ -491,10 +496,10 @@ toggleImportExportBtn.addEventListener("click", () => {
 
 
 function getFormattedDateEu() {
-  const now = new Date();
+    const now = new Date();
 
-  const day = now.getDate();
-  const month = now.getMonth() + 1; // JS months start at 0
+    const day = now.getDate();
+    const month = now.getMonth() + 1; // JS months start at 0
 
-  return `${day}.${month}.`;
+    return `${day}.${month}.`;
 }
