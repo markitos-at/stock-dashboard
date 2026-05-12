@@ -367,8 +367,8 @@ form.addEventListener("submit", (e) => {
     // reset form
     form.reset();
 
-    // hide form again (optional UX)
-    form.classList.add("hidden");
+    // // hide form again (optional UX)
+    // form.classList.add("hidden"); 
 
     // re-render UI
     loadStocks();
@@ -449,29 +449,30 @@ document.getElementById("importBtn").addEventListener("click", () => {
     }
 });
 
-const importExportSection = document.getElementById("importExportSection");
+// Import export references
+const sectionImportExport = document.getElementById("importExportSection");
 const toggleImportExportBtn = document.getElementById("toggleImportExportBtn");
 
-// existing form refs
-const formAddOpt = document.getElementById("sectionAddOption");
+// Option form references
+const sectionAddOpt = document.getElementById("sectionAddOption");
 const toggleFormBtn = document.getElementById("toggleFormBtn");
 
 
 // Toggle Add Option
 toggleFormBtn.addEventListener("click", () => {
-    const isHidden = formAddOpt.classList.contains("hidden");
+    const isHidden = sectionAddOpt.classList.contains("hidden");
 
     // close both first
-    formAddOpt.classList.add("hidden");
-    importExportSection.classList.add("hidden");
+    sectionAddOpt.classList.add("hidden");
+    sectionImportExport.classList.add("hidden");
 
     // then open if it was closed
     if (isHidden) {
-        formAddOpt.classList.remove("hidden");
+        sectionAddOpt.classList.remove("hidden");
 
         // scroll to AFTER display
         setTimeout(() => {
-            scrollToSection(formAddOpt);
+            scrollToSection(sectionAddOpt);
             document.getElementById("tickerInput").focus();
         }, 50);
     }
@@ -480,16 +481,16 @@ toggleFormBtn.addEventListener("click", () => {
 
 // Toggle Import/Export
 toggleImportExportBtn.addEventListener("click", () => {
-    const isHidden = importExportSection.classList.contains("hidden");
+    const isHidden = sectionImportExport.classList.contains("hidden");
 
-    formAddOpt.classList.add("hidden");
-    importExportSection.classList.add("hidden");
+    sectionAddOpt.classList.add("hidden");
+    sectionImportExport.classList.add("hidden");
 
     if (isHidden) {
-        importExportSection.classList.remove("hidden");
+        sectionImportExport.classList.remove("hidden");
 
         setTimeout(() => {
-            scrollToSection(importExportSection);
+            scrollToSection(sectionImportExport);
         }, 50);
     }
 });
