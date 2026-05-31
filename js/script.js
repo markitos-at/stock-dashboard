@@ -12,7 +12,7 @@ function getBasePrices() {
 }
 
 function saveBasePrices(data) {
-    console.log('basePrice.saved');
+    // console.log('basePrice.saved');
     localStorage.setItem("stockBase", JSON.stringify(data));
 }
 
@@ -21,7 +21,7 @@ function getCache() {
 }
 
 function saveCache(data) {
-    console.log('stockCache.saved');
+    // console.log('stockCache.saved');
     localStorage.setItem("stockCache", JSON.stringify(data));
 }
 
