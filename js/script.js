@@ -191,7 +191,7 @@ async function loadStocks() {
         // ------------------------
         // Build cache from live data
         // ------------------------
-        const cache = {};
+        const cache = getCache();
         const rows = rowsText.split("\n").slice(1);
 
         rows.forEach(row => {
@@ -201,7 +201,10 @@ async function loadStocks() {
             const numPrice = parseFloat(price);
 
             if (!isNaN(numPrice)) {
+                // if it is a number update cache
                 cache[ticker] = numPrice;
+            } else {
+                console.log('Using cached value for ', ticker);
             }
         });
 
