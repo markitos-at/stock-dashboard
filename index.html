@@ -15,6 +15,8 @@
 
     <div id="stocks" class="space-y-3"></div>
 
+    <div id="ownedList"></div>
+
     <div class="action-buttons">
       <button id="toggleFormBtn" class="toggle-btn">
         ➕ Add Option
@@ -22,6 +24,10 @@
 
       <button id="toggleImportExportBtn" class="toggle-btn">
         📦 Import / Export
+      </button>
+
+      <button id="toggleOwnedBtn" class="toggle-btn">
+        📈 Owned Shares
       </button>
     </div>
 
@@ -56,6 +62,30 @@
 
         <button id="importBtn">📥 Import (Replace)</button>
       </div>
+    </div>
+
+    <div id="sectionOwned" class="hidden">
+
+      <form id="ownedForm" class="option-form">
+
+        <select id="ownedTickerInput" required></select>
+
+        <select id="ownedAmountInput">
+          <option value="1">1 Contract (100 shares)</option>
+          <option value="2">2 Contracts</option>
+          <option value="3">3 Contracts</option>
+          <option value="4">4 Contracts</option>
+          <option value="5">5 Contracts</option>
+          <option value="6">6 Contracts</option>
+          <option value="7">7 Contracts</option>
+          <option value="8">8 Contracts</option>
+          <option value="9">9 Contracts</option>
+          <option value="10">10 Contracts</option>
+        </select>
+        <button type="submit">
+          Save
+        </button>
+      </form>
     </div>
   </div>
   <footer id="statusBar" class="status-bar text-center">

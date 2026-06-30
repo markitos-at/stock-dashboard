@@ -73,6 +73,62 @@ function deleteOption(ticker, index) {
     loadStocks(); // re-render
 }
 
+// ------------------------
+// Owned shares/contracts
+// ------------------------
+function getOwned() {
+    return JSON.parse(localStorage.getItem("stockOwned")) || {};
+}
+
+function saveOwned(data) {
+    localStorage.setItem("stockOwned", JSON.stringify(data));
+}
+
+function addOwned(ticker, amount) {
+    const owned = getOwned();
+    owned[ticker] = parseInt(amount);
+    saveOwned(owned);
+}
+
+function removeOwnedContract(ticker) {
+    const owned = getOwned();
+
+    if (!owned[ticker]) return;
+
+    owned[ticker]--; // remove one
+
+    if (owned[ticker] <= 0) {
+        delete owned[ticker];
+    }
+
+    saveOwned(owned);
+    loadStocks();
+}
+
+function populateOwnedTickerSelect() {
+    const select = document.getElementById("ownedTickerInput");
+    const cache = getCache();
+
+    const tickers = Object.keys(cache).sort();
+
+    select.innerHTML = ""; // clear old options
+
+    // placeholder
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Select ticker";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    select.appendChild(placeholder);
+
+    tickers.forEach(ticker => {
+        const opt = document.createElement("option");
+        opt.value = ticker;
+        opt.textContent = ticker;
+        select.appendChild(opt);
+    });
+}
+
 
 // ------------------------
 // Options UI - Render options per Ticker
@@ -145,6 +201,58 @@ function renderOptionsElement(ticker, currentPrice) {
 }
 
 // ------------------------
+// Render owned list
+// ------------------------
+function renderOwnedList() {
+
+    const container = document.getElementById("ownedList");
+
+    const owned = getOwned();
+
+    container.innerHTML = "";
+
+    const tickers = Object.keys(owned);
+
+    if (tickers.length === 0)
+        return;
+
+    const title = document.createElement("h2");
+    title.textContent = "Owned Shares";
+
+    container.appendChild(title);
+
+    tickers.sort();
+
+    tickers.forEach(ticker => {
+
+        const row = document.createElement("div");
+        row.className = "owned-row";
+
+        const left = document.createElement("div");
+
+        left.innerHTML =
+            `<strong>${ticker}</strong><br>
+            ${owned[ticker]} contract${owned[ticker] > 1 ? "s" : ""}`;
+
+        const deleteBtn = document.createElement("button");
+
+        deleteBtn.className = "delete-btn";
+
+        deleteBtn.textContent = "✕";
+
+        deleteBtn.onclick = () => removeOwnedContract(ticker);
+
+        row.appendChild(left);
+        row.appendChild(deleteBtn);
+
+        container.appendChild(row);
+
+    });
+
+}
+
+
+// ------------------------
 // Status display function
 // ------------------------
 function updateStatus(type) {
@@ -211,6 +319,7 @@ async function loadStocks() {
         saveCache(cache);
         updateStatus("live");
         console.log("liveData.loaded");
+        populateOwnedTickerSelect(); // add ticker to form select field
     } catch (err) {
         isLive = false;
 
@@ -228,6 +337,7 @@ async function loadStocks() {
             .join("\n");
 
         updateStatus("cache");
+        populateOwnedTickerSelect();
     }
 
 
@@ -283,7 +393,20 @@ async function loadStocks() {
         // ------------------------
 
         const stockEl = document.createElement("div");
-        stockEl.className = `stock ${statusClass}`;
+
+        const owned = getOwned();
+        const contractsOwned = owned[ticker] || 0;
+        const stockOptions = getOptions()[ticker] || [];
+        const coveredCalls = stockOptions.filter(o => o.type === "CALL").length;
+
+        stockEl.classList.add("stock");
+        stockEl.classList.add(statusClass);
+
+        if (contractsOwned > coveredCalls) {
+            // adding class to indicate call selling possible
+            stockEl.classList.add("needs-call");
+        }
+
 
         const left = document.createElement("div");
         left.classList.add("text-left");
@@ -309,6 +432,16 @@ async function loadStocks() {
         container.appendChild(stockEl);
 
         // ------------------------
+        // Append OPTION possibilities
+        // ------------------------
+        if (contractsOwned > coveredCalls) {
+            const warning = document.createElement("div");
+            warning.className = "call-warning text-left";
+            warning.textContent = `🟡 ${contractsOwned - coveredCalls} CC available`;
+            container.appendChild(warning);
+        }
+
+        // ------------------------
         // Append OPTIONS
         // ------------------------
 
@@ -320,6 +453,8 @@ async function loadStocks() {
     });
 
     saveBasePrices(basePrices);
+
+    renderOwnedList();
 }
 
 // ------------------------
@@ -334,6 +469,7 @@ setInterval(loadStocks, 90000); // 90 sec
 // Form logic
 // ------------------------
 const form = document.getElementById("optionForm");
+const ownedForm = document.getElementById("ownedForm");
 
 form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -375,6 +511,40 @@ form.addEventListener("submit", (e) => {
 
     // re-render UI
     loadStocks();
+});
+
+
+ownedForm.addEventListener("submit", e => {
+
+    e.preventDefault();
+
+    const ticker =
+        document
+            .getElementById("ownedTickerInput")
+            .value
+            .trim()
+            .toUpperCase();
+
+    const amount = document.getElementById("ownedAmountInput").value;
+
+    if (!ticker.match(/^[A-Z]{1,5}$/)) {
+        alert("Invalid ticker");
+        return;
+    }
+
+    const cache = getCache();
+
+    if (!cache[ticker]) {
+        alert("Ticker not in list");
+        return;
+    }
+
+    addOwned(ticker, amount);
+
+    ownedForm.reset();
+
+    loadStocks();
+
 });
 
 tickerInput.addEventListener("input", (e) => {
@@ -460,12 +630,16 @@ const toggleImportExportBtn = document.getElementById("toggleImportExportBtn");
 const sectionAddOpt = document.getElementById("sectionAddOption");
 const toggleFormBtn = document.getElementById("toggleFormBtn");
 
+// Ownde form references
+const sectionOwned = document.getElementById("sectionOwned");
+const toggleOwnedBtn = document.getElementById("toggleOwnedBtn");
 
 // Toggle Add Option
 toggleFormBtn.addEventListener("click", () => {
     const isHidden = sectionAddOpt.classList.contains("hidden");
 
-    // close both first
+    // close all toggle sections first
+    sectionOwned.classList.add("hidden");
     sectionAddOpt.classList.add("hidden");
     sectionImportExport.classList.add("hidden");
 
@@ -486,6 +660,7 @@ toggleFormBtn.addEventListener("click", () => {
 toggleImportExportBtn.addEventListener("click", () => {
     const isHidden = sectionImportExport.classList.contains("hidden");
 
+    sectionOwned.classList.add("hidden");
     sectionAddOpt.classList.add("hidden");
     sectionImportExport.classList.add("hidden");
 
@@ -496,6 +671,25 @@ toggleImportExportBtn.addEventListener("click", () => {
             scrollToSection(sectionImportExport);
         }, 50);
     }
+});
+
+// Toggle Owned Form
+toggleOwnedBtn.addEventListener("click", () => {
+
+    const isHidden = sectionOwned.classList.contains("hidden");
+
+    sectionOwned.classList.add("hidden");
+    sectionAddOpt.classList.add("hidden");
+    sectionImportExport.classList.add("hidden");
+
+    if (isHidden) {
+        sectionOwned.classList.remove("hidden");
+        setTimeout(() => {
+            scrollToSection(sectionOwned);
+            document.getElementById("ownedTickerInput").focus();
+        }, 50);
+    }
+
 });
 
 

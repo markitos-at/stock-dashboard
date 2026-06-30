@@ -34,6 +34,11 @@ h1 {
     margin-bottom: 15px;
     background: #1f2937;
     color: white;
+
+    &.needs-call {
+        border: 1px solid #facc15;
+        box-shadow: 0 0 8px rgba(250, 204, 21, .5);
+    }
 }
 
 .stock.up {
@@ -74,9 +79,11 @@ h1 {
 .text-center {
     text-align: center;
 }
+
 .text-left {
     text-align: left;
 }
+
 .position-relative {
     position: relative;
 }
@@ -245,6 +252,51 @@ h1 {
     .import-title {
         padding-top: 20px;
     }
+}
+
+// ------------------------
+// Owned stocks list
+// ------------------------
+#ownedList {
+    max-width: 500px;
+    margin: 35px auto;
+
+    h2 {
+        margin-bottom: 15px;
+        font-size: 18px;
+    }
+}
+
+.owned-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    background: #1f2937;
+
+    .delete-btn {
+        background: transparent;
+        border: none;
+        color: #9ca3af;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .delete-btn:hover {
+        color: #f87171;
+    }
+}
+
+.call-warning {
+    max-width: 500px;
+    margin: -8px 0 8px 5px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: #facc15;
+    font-size: 13px;
+    font-weight: bold;
 }
 
 // ------------------------
