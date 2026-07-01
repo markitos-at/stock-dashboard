@@ -259,7 +259,7 @@ h1 {
 // ------------------------
 #ownedList {
     max-width: 500px;
-    margin: 35px auto;
+    margin: 70px auto 35px auto;
 
     h2 {
         margin-bottom: 15px;
@@ -286,6 +286,38 @@ h1 {
 
     .delete-btn:hover {
         color: #f87171;
+    }
+
+    .owned-bottom {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 2px;
+    }
+
+    .owned-btn {
+        background: transparent;
+        border: none;
+        color: #9ca3af;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: bold;
+        padding: 0 2px;
+    }
+
+    .owned-btn:hover {
+        color: white;
+    }
+
+    .owned-btn.plus:hover {
+        color: #4ade80;
+    }
+
+    .owned-btn.minus:hover {
+        color: #fbbf24;
+    }
+    .owned-contracts {
+        min-width: 80px;
     }
 }
 

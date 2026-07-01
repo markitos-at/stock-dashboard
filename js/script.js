@@ -90,16 +90,38 @@ function addOwned(ticker, amount) {
     saveOwned(owned);
 }
 
+
+function addOwnedContract(ticker) {
+    const owned = getOwned();
+
+    if (!owned[ticker]) return;
+
+    owned[ticker]++;
+
+    saveOwned(owned);
+    loadStocks();
+}
+
 function removeOwnedContract(ticker) {
     const owned = getOwned();
 
     if (!owned[ticker]) return;
 
-    owned[ticker]--; // remove one
+    owned[ticker]--;
 
     if (owned[ticker] <= 0) {
         delete owned[ticker];
     }
+
+    saveOwned(owned);
+    loadStocks();
+}
+
+function deleteOwned(ticker) {
+    const owned = getOwned();
+
+    if (!owned[ticker]) return;
+    delete owned[ticker];
 
     saveOwned(owned);
     loadStocks();
@@ -226,21 +248,45 @@ function renderOwnedList() {
     tickers.forEach(ticker => {
 
         const row = document.createElement("div");
-        row.className = "owned-row";
+        row.className = "owned-row text-left";
 
+        // Left side
         const left = document.createElement("div");
 
-        left.innerHTML =
-            `<strong>${ticker}</strong><br>
-            ${owned[ticker]} contract${owned[ticker] > 1 ? "s" : ""}`;
+        const tickerEl = document.createElement("div");
+        tickerEl.innerHTML = `<strong>${ticker}</strong>`;
 
+        const bottom = document.createElement("div");
+        bottom.className = "owned-bottom";
+
+        const amount = document.createElement("span");
+        amount.className = "owned-contracts";
+        amount.textContent = `${owned[ticker]} contract${owned[ticker] > 1 ? "s" : ""}`;
+
+        // +
+        const addBtn = document.createElement("button");
+        addBtn.className = "owned-btn plus";
+        addBtn.textContent = "+";
+        addBtn.onclick = () => addOwnedContract(ticker);
+
+        // -
+        const minusBtn = document.createElement("button");
+        minusBtn.className = "owned-btn minus";
+        minusBtn.textContent = "−";
+        minusBtn.onclick = () => removeOwnedContract(ticker);
+
+        bottom.appendChild(amount);
+        bottom.appendChild(minusBtn);
+        bottom.appendChild(addBtn);
+
+        left.appendChild(tickerEl);
+        left.appendChild(bottom);
+
+        // X button
         const deleteBtn = document.createElement("button");
-
         deleteBtn.className = "delete-btn";
-
         deleteBtn.textContent = "✕";
-
-        deleteBtn.onclick = () => removeOwnedContract(ticker);
+        deleteBtn.onclick = () => deleteOwned(ticker);
 
         row.appendChild(left);
         row.appendChild(deleteBtn);
