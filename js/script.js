@@ -228,7 +228,6 @@ function renderOptionsElement(ticker, currentPrice) {
 function renderOwnedList() {
 
     const container = document.getElementById("ownedList");
-
     const owned = getOwned();
 
     container.innerHTML = "";
@@ -238,11 +237,34 @@ function renderOwnedList() {
     if (tickers.length === 0)
         return;
 
-    const title = document.createElement("h2");
-    title.textContent = "Owned Shares";
+    // section toggle header
+    const toggle = document.createElement("button");
+    toggle.className = "section-owned-toggle";
 
-    container.appendChild(title);
+    const icon = document.createElement("span");
+    icon.className = "toggle-icon";
+    icon.textContent = "▶";
 
+    const title = document.createElement("span");
+    title.className = "toggle-title";
+    title.textContent = `Owned Shares (${tickers.length})`;
+
+    toggle.appendChild(icon);
+    toggle.appendChild(title);
+
+    container.appendChild(toggle);
+
+    // content wrapper for toggle
+    const content = document.createElement("div");
+    content.className = "section-owned-content";
+
+    // toggle behaviour
+    toggle.onclick = () => {
+        toggle.classList.toggle("expanded");
+        content.classList.toggle("expanded");
+    };
+
+    // sort tickers
     tickers.sort();
 
     tickers.forEach(ticker => {
@@ -260,8 +282,10 @@ function renderOwnedList() {
         bottom.className = "owned-bottom";
 
         const amount = document.createElement("span");
+        const qty = owned[ticker];
+
         amount.className = "owned-contracts";
-        amount.textContent = `${owned[ticker]} contract${owned[ticker] > 1 ? "s" : ""}`;
+        amount.textContent = `${qty} contract${qty > 1 ? "s" : ""}`;
 
         // +
         const addBtn = document.createElement("button");
@@ -291,10 +315,10 @@ function renderOwnedList() {
         row.appendChild(left);
         row.appendChild(deleteBtn);
 
-        container.appendChild(row);
-
+        content.appendChild(row);
     });
 
+    container.appendChild(content);
 }
 
 
@@ -747,3 +771,14 @@ function getFormattedDateEu() {
 
     return `${day}.${month}.`;
 }
+
+// toggle owned shares section
+const toggleOwned = document.querySelector(".section-owned-toggle");
+const contentOwned = document.querySelector(".section-owned-content");
+
+toggleOwned.addEventListener("click", () => {
+
+    toggleOwned.classList.toggle("expanded");
+    contentOwned.classList.toggle("expanded");
+
+});

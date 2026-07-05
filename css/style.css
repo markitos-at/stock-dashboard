@@ -317,3 +317,30 @@ h1 {
 .status-bar .separator {
   padding: 0 4px;
 }
+
+.section-owned-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+.section-owned-toggle .toggle-icon {
+  transition: transform 0.2s ease;
+}
+.section-owned-toggle.expanded .toggle-icon {
+  transform: rotate(90deg);
+}
+
+.section-owned-content {
+  display: none;
+}
+.section-owned-content.expanded {
+  display: block;
+}

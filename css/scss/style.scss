@@ -316,6 +316,7 @@ h1 {
     .owned-btn.minus:hover {
         color: #fbbf24;
     }
+
     .owned-contracts {
         min-width: 80px;
     }
@@ -368,5 +369,40 @@ h1 {
 
     .separator {
         padding: 0 4px;
+    }
+}
+
+
+.section-owned-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    background: none;
+    border: none;
+    color: #fff;
+
+    font-size: 22px;
+    font-weight: bold;
+
+    margin-bottom: 20px;
+
+    cursor: pointer;
+
+    .toggle-icon {
+        transition: transform .2s ease;
+    }
+
+    &.expanded .toggle-icon {
+        transform: rotate(90deg);
+    }
+}
+
+.section-owned-content {
+    display: none;
+
+    &.expanded {
+        display: block;
     }
 }
