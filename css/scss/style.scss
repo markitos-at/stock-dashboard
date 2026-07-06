@@ -410,3 +410,9 @@ h1 {
 .pb-10 {
     padding-bottom: 10px;
 }
+
+#sectionAddOption,
+#importExportSection, 
+#sectionOwned {
+    min-height: 350px;
+}
