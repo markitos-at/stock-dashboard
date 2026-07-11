@@ -196,7 +196,10 @@ function renderOptionsElement(ticker, currentPrice) {
 
         const expiryEl = document.createElement("span");
         expiryEl.className = "expiry";
-        expiryEl.textContent = ` (${expiry})`;
+        const formattedExpiry = formatExpiry(expiry);
+        const dte = getDTE(expiry);
+
+        expiryEl.textContent = "("+formattedExpiry+" | "+dte+" DTE )";
 
         left.appendChild(expiryEl);
 
@@ -544,11 +547,10 @@ const ownedForm = document.getElementById("ownedForm");
 form.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    let ticker = document.getElementById("tickerInput").value.trim().toUpperCase();
-    const type = document.getElementById("typeInput").value;
-    const strike = parseFloat(document.getElementById("strikeInput").value);
-    const expiryRaw = document.getElementById("expiryInput").value.trim();
-    const expiry = escapeHTML(expiryRaw).substring(0, 20);
+    let ticker = document.getElementById("tickerInput").value.trim().toUpperCase(); // Ticker name
+    const type = document.getElementById("typeInput").value; // CALL or PUT
+    const strike = parseFloat(document.getElementById("strikeInput").value); // number
+    const expiry = document.getElementById("expiryInput").value; // getting date input
 
     if (!ticker || !strike) {
         alert("Ticker and strike required");
@@ -636,6 +638,29 @@ function scrollToSection(el) {
         behavior: "smooth",
         block: "start"
     });
+}
+
+function formatExpiry(dateString) {
+    if (!dateString) return "";
+
+    const date = new Date(dateString);
+
+    return `${date.getDate()}.${date.getMonth() + 1}.`;
+}
+
+function getDTE(dateString) {
+    if (!dateString) return 0;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const expiry = new Date(dateString);
+    expiry.setHours(0, 0, 0, 0);
+
+    const diff =
+        Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+
+    return Math.max(0, diff);
 }
 
 // ------------------------
