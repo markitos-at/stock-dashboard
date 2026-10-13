@@ -50,9 +50,16 @@ const toggleImportExportBtn = document.getElementById("toggleImportExportBtn");
 const sectionAddOpt = document.getElementById("sectionAddOption");
 const toggleFormBtn = document.getElementById("toggleFormBtn");
 
-// Ownde form references
+// Owned form references
 const sectionOwned = document.getElementById("sectionOwned");
 const toggleOwnedBtn = document.getElementById("toggleOwnedBtn");
+
+// Function to remove active class accross all btns
+function toggleBtnRmvActive() {
+    toggleImportExportBtn.classList.remove("active");
+    toggleOwnedBtn.classList.remove("active");
+    toggleFormBtn.classList.remove("active");
+}
 
 // Toggle Add Option
 toggleFormBtn.addEventListener("click", () => {
@@ -62,10 +69,12 @@ toggleFormBtn.addEventListener("click", () => {
     sectionOwned.classList.add("hidden");
     sectionAddOpt.classList.add("hidden");
     sectionImportExport.classList.add("hidden");
+    toggleBtnRmvActive();
 
     // then open if it was closed
     if (isHidden) {
         sectionAddOpt.classList.remove("hidden");
+        toggleFormBtn.classList.add("active");
 
         // scroll to AFTER display
         setTimeout(() => {
@@ -83,9 +92,11 @@ toggleImportExportBtn.addEventListener("click", () => {
     sectionOwned.classList.add("hidden");
     sectionAddOpt.classList.add("hidden");
     sectionImportExport.classList.add("hidden");
+    toggleBtnRmvActive();
 
     if (isHidden) {
         sectionImportExport.classList.remove("hidden");
+        toggleImportExportBtn.classList.add("active");
 
         setTimeout(() => {
             scrollToSection(sectionImportExport);
@@ -100,10 +111,12 @@ toggleOwnedBtn.addEventListener("click", () => {
 
     sectionOwned.classList.add("hidden");
     sectionAddOpt.classList.add("hidden");
+    toggleBtnRmvActive();
     sectionImportExport.classList.add("hidden");
 
     if (isHidden) {
         sectionOwned.classList.remove("hidden");
+        toggleOwnedBtn.classList.add("active");
         setTimeout(() => {
             scrollToSection(sectionOwned);
             document.getElementById("ownedTickerInput").focus();

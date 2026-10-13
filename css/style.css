@@ -143,6 +143,9 @@ h1 {
   border: none;
   font-size: 16px;
 }
+.toggle-btn.active {
+  box-shadow: 0 0 8px rgba(250, 204, 21, 0.5);
+}
 
 .option-form {
   max-width: 500px;
