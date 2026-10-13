@@ -1,132 +1,8 @@
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSNyk88km-5bG4EIzBNezvRHjmiZS4roGe_l3hb_0dexC_l4yC25shHbmxsmqWP3GUBdYU466lnaGok/pub?output=csv";
 
 // ------------------------
-// Storage helpers
-// ------------------------
-function getToday() {
-    return new Date().toISOString().split("T")[0];
-}
-
-function getBasePrices() {
-    return JSON.parse(localStorage.getItem("stockBase")) || {};
-}
-
-function saveBasePrices(data) {
-    // console.log('basePrice.saved');
-    localStorage.setItem("stockBase", JSON.stringify(data));
-}
-
-function getCache() {
-    return JSON.parse(localStorage.getItem("stockCache")) || {};
-}
-
-function saveCache(data) {
-    // console.log('stockCache.saved');
-    localStorage.setItem("stockCache", JSON.stringify(data));
-}
-
-// ------------------------
-// Options storage
-// ------------------------
-function getOptions() {
-    return JSON.parse(localStorage.getItem("stockOptions")) || {};
-}
-
-function saveOptions(data) {
-    localStorage.setItem("stockOptions", JSON.stringify(data));
-}
-
-function addOption(ticker, type, strike, expiry) {
-    const options = getOptions();
-
-    ticker = ticker.toUpperCase();
-
-    if (!options[ticker]) {
-        options[ticker] = [];
-    }
-
-    options[ticker].push({
-        type,
-        strike: parseFloat(strike),
-        expiry
-    });
-
-    saveOptions(options);
-}
-
-function deleteOption(ticker, index) {
-    //if (!confirm("Delete this option?")) return;
-
-    const options = getOptions();
-
-    if (!options[ticker]) return;
-
-    options[ticker].splice(index, 1);
-
-    // clean up empty arrays
-    if (options[ticker].length === 0) {
-        delete options[ticker];
-    }
-
-    saveOptions(options);
-
-    loadStocks(); // re-render
-}
-
-// ------------------------
 // Owned shares/contracts
 // ------------------------
-function getOwned() {
-    return JSON.parse(localStorage.getItem("stockOwned")) || {};
-}
-
-function saveOwned(data) {
-    localStorage.setItem("stockOwned", JSON.stringify(data));
-}
-
-function addOwned(ticker, amount) {
-    const owned = getOwned();
-    owned[ticker] = parseInt(amount);
-    saveOwned(owned);
-}
-
-
-function addOwnedContract(ticker) {
-    const owned = getOwned();
-
-    if (!owned[ticker]) return;
-
-    owned[ticker]++;
-
-    saveOwned(owned);
-    loadStocks();
-}
-
-function removeOwnedContract(ticker) {
-    const owned = getOwned();
-
-    if (!owned[ticker]) return;
-
-    owned[ticker]--;
-
-    if (owned[ticker] <= 0) {
-        delete owned[ticker];
-    }
-
-    saveOwned(owned);
-    loadStocks();
-}
-
-function deleteOwned(ticker) {
-    const owned = getOwned();
-
-    if (!owned[ticker]) return;
-    delete owned[ticker];
-
-    saveOwned(owned);
-    loadStocks();
-}
-
 function populateOwnedTickerSelect() {
     const select = document.getElementById("ownedTickerInput");
     const cache = getCache();
@@ -263,6 +139,7 @@ function renderOwnedList() {
 
     // toggle behaviour
     toggle.onclick = () => {
+        //console.log('toggle.onClick.click');
         toggle.classList.toggle("expanded");
         content.classList.toggle("expanded");
     };
@@ -324,37 +201,6 @@ function renderOwnedList() {
     container.appendChild(content);
 }
 
-
-// ------------------------
-// Status display function
-// ------------------------
-function updateStatus(type) {
-    const statusEl = document.querySelector("#statusBar .status");
-    const dateEl = document.querySelector("#statusBar .date");
-
-    // reset classes
-    statusEl.classList.remove("live", "cache", "error");
-
-    const dateStr = getFormattedDateEu();
-
-    if (type === "live") {
-        statusEl.textContent = "Live data";
-        statusEl.classList.add("live");
-    }
-
-    if (type === "cache") {
-        statusEl.textContent = "Cached data";
-        statusEl.classList.add("cache");
-    }
-
-    if (type === "error") {
-        statusEl.textContent = "No data";
-        statusEl.classList.add("error");
-    }
-
-    // update date
-    dateEl.textContent = dateStr;
-}
 
 // ------------------------
 // Main loading function
@@ -624,44 +470,6 @@ tickerInput.addEventListener("input", (e) => {
     e.target.value = e.target.value.toUpperCase();
 });
 
-// ------------------------
-// Helper function
-// ------------------------
-function escapeHTML(str) {
-    const p = document.createElement('p');
-    p.textContent = str;
-    return p.innerHTML;
-}
-
-function scrollToSection(el) {
-    el.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
-}
-
-function formatExpiry(dateString) {
-    if (!dateString) return "";
-
-    const date = new Date(dateString);
-
-    return `${date.getDate()}.${date.getMonth() + 1}.`;
-}
-
-function getDTE(dateString) {
-    if (!dateString) return 0;
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const expiry = new Date(dateString);
-    expiry.setHours(0, 0, 0, 0);
-
-    const diff =
-        Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-
-    return Math.max(0, diff);
-}
 
 // ------------------------
 // Import Export functionality
@@ -674,11 +482,17 @@ document.getElementById("exportBtn").addEventListener("click", () => {
     document.getElementById("exportOutput").value = json;
 });
 
-document.getElementById("copyBtn").addEventListener("click", () => {
+document.getElementById("copyBtn").addEventListener("click", async () => {
     const textarea = document.getElementById("exportOutput");
 
-    textarea.select();
-    document.execCommand("copy");
+     try {
+        // Direct replacement for document.execCommand("copy")
+        await navigator.clipboard.writeText(textarea.value);
+        alert("Copied!");
+    } catch (err) {
+        console.error("Failed to copy text: ", err);
+        alert("Could not copy text. Please try again.");
+    }
 
     alert("Copied!");
 });
@@ -715,95 +529,4 @@ document.getElementById("importBtn").addEventListener("click", () => {
         alert("Invalid JSON format");
         console.error(err);
     }
-});
-
-// Import export references
-const sectionImportExport = document.getElementById("importExportSection");
-const toggleImportExportBtn = document.getElementById("toggleImportExportBtn");
-
-// Option form references
-const sectionAddOpt = document.getElementById("sectionAddOption");
-const toggleFormBtn = document.getElementById("toggleFormBtn");
-
-// Ownde form references
-const sectionOwned = document.getElementById("sectionOwned");
-const toggleOwnedBtn = document.getElementById("toggleOwnedBtn");
-
-// Toggle Add Option
-toggleFormBtn.addEventListener("click", () => {
-    const isHidden = sectionAddOpt.classList.contains("hidden");
-
-    // close all toggle sections first
-    sectionOwned.classList.add("hidden");
-    sectionAddOpt.classList.add("hidden");
-    sectionImportExport.classList.add("hidden");
-
-    // then open if it was closed
-    if (isHidden) {
-        sectionAddOpt.classList.remove("hidden");
-
-        // scroll to AFTER display
-        setTimeout(() => {
-            scrollToSection(sectionAddOpt);
-            document.getElementById("tickerInput").focus();
-        }, 50);
-    }
-});
-
-
-// Toggle Import/Export
-toggleImportExportBtn.addEventListener("click", () => {
-    const isHidden = sectionImportExport.classList.contains("hidden");
-
-    sectionOwned.classList.add("hidden");
-    sectionAddOpt.classList.add("hidden");
-    sectionImportExport.classList.add("hidden");
-
-    if (isHidden) {
-        sectionImportExport.classList.remove("hidden");
-
-        setTimeout(() => {
-            scrollToSection(sectionImportExport);
-        }, 50);
-    }
-});
-
-// Toggle Owned Form
-toggleOwnedBtn.addEventListener("click", () => {
-
-    const isHidden = sectionOwned.classList.contains("hidden");
-
-    sectionOwned.classList.add("hidden");
-    sectionAddOpt.classList.add("hidden");
-    sectionImportExport.classList.add("hidden");
-
-    if (isHidden) {
-        sectionOwned.classList.remove("hidden");
-        setTimeout(() => {
-            scrollToSection(sectionOwned);
-            document.getElementById("ownedTickerInput").focus();
-        }, 50);
-    }
-
-});
-
-
-function getFormattedDateEu() {
-    const now = new Date();
-
-    const day = now.getDate();
-    const month = now.getMonth() + 1; // JS months start at 0
-
-    return `${day}.${month}.`;
-}
-
-// toggle owned shares section
-const toggleOwned = document.querySelector(".section-owned-toggle");
-const contentOwned = document.querySelector(".section-owned-content");
-
-toggleOwned.addEventListener("click", () => {
-
-    toggleOwned.classList.toggle("expanded");
-    contentOwned.classList.toggle("expanded");
-
 });
