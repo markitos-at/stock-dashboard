@@ -489,6 +489,7 @@ document.getElementById("copyBtn").addEventListener("click", async () => {
         // Direct replacement for document.execCommand("copy")
         await navigator.clipboard.writeText(textarea.value);
         alert("Copied!");
+        textarea.value = "";
     } catch (err) {
         console.error("Failed to copy text: ", err);
         alert("Could not copy text. Please try again.");
@@ -520,6 +521,7 @@ document.getElementById("importBtn").addEventListener("click", () => {
         localStorage.setItem("stockOptions", JSON.stringify(parsed));
 
         alert("Import successful!");
+        input = ""; // clear import after import is done
 
         loadStocks();
 
