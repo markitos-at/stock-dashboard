@@ -493,8 +493,6 @@ document.getElementById("copyBtn").addEventListener("click", async () => {
         console.error("Failed to copy text: ", err);
         alert("Could not copy text. Please try again.");
     }
-
-    alert("Copied!");
 });
 
 document.getElementById("importBtn").addEventListener("click", () => {
