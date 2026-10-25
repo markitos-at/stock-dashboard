@@ -80,7 +80,18 @@ function deleteOption(ticker, index) {
 // ------------------------
 function getOwned() {
     // owned stocks
-    return JSON.parse(localStorage.getItem("stockOwned")) || {};
+    const storedOwned = localStorage.getItem("stockOwned");
+
+    if (!storedOwned) return {};
+
+    try {
+        const owned = JSON.parse(storedOwned);
+        return owned && typeof owned === "object" && !Array.isArray(owned)
+            ? owned
+            : {};
+    } catch (err) {
+        return {};
+    }
 }
 
 function saveOwned(data) {
@@ -88,9 +99,12 @@ function saveOwned(data) {
     localStorage.setItem("stockOwned", JSON.stringify(data));
 }
 
-function addOwned(ticker, amount) {
+function addOwned(ticker, amount, costBasis) {
     const owned = getOwned();
-    owned[ticker] = parseInt(amount);
+    owned[ticker] = {
+        contracts: parseInt(amount, 10),
+        costBasis: parseFloat(costBasis)
+    };
     saveOwned(owned);
 }
 
@@ -99,7 +113,7 @@ function addOwnedContract(ticker) {
 
     if (!owned[ticker]) return;
 
-    owned[ticker]++;
+    owned[ticker].contracts++;
 
     saveOwned(owned);
     loadStocks();
@@ -110,9 +124,9 @@ function removeOwnedContract(ticker) {
 
     if (!owned[ticker]) return;
 
-    owned[ticker]--;
+    owned[ticker].contracts--;
 
-    if (owned[ticker] <= 0) {
+    if (owned[ticker].contracts <= 0) {
         delete owned[ticker];
     }
 

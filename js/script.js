@@ -162,7 +162,7 @@ function renderOwnedList() {
         bottom.className = "owned-bottom";
 
         const amount = document.createElement("span");
-        const qty = owned[ticker];
+        const qty = owned[ticker]?.contracts || 0;
 
         amount.className = "owned-contracts";
         amount.textContent = `${qty} contract${qty > 1 ? "s" : ""}`;
@@ -314,7 +314,7 @@ async function loadStocks() {
         const stockEl = document.createElement("div");
 
         const owned = getOwned();
-        const contractsOwned = owned[ticker] || 0;
+        const contractsOwned = owned[ticker]?.contracts || 0;
         const stockOptions = getOptions()[ticker] || [];
         const coveredCalls = stockOptions.filter(o => o.type === "CALL").length;
 
@@ -444,6 +444,7 @@ ownedForm.addEventListener("submit", e => {
             .toUpperCase();
 
     const amount = document.getElementById("ownedAmountInput").value;
+    const costBasis = parseFloat(document.getElementById("ownedCostBasisInput").value);
 
     if (!ticker.match(/^[A-Z]{1,5}$/)) {
         alert("Invalid ticker");
@@ -457,7 +458,12 @@ ownedForm.addEventListener("submit", e => {
         return;
     }
 
-    addOwned(ticker, amount);
+    if (!Number.isFinite(costBasis) || costBasis <= 0) {
+        alert("Cost basis per share must be a positive number");
+        return;
+    }
+
+    addOwned(ticker, amount, costBasis);
 
     ownedForm.reset();
 
