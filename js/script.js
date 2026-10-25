@@ -351,6 +351,22 @@ async function loadStocks() {
         container.appendChild(stockEl);
 
         // ------------------------
+        // Append Cost basis display
+        // ------------------------
+        if (contractsOwned > 0) {
+            const costBasisEl = document.createElement("div");
+            const changeEl = document.createElement("span");
+            costBasisEl.className = "cost-basis text-right";
+            const costBasis = Number(owned[ticker].costBasis);
+            const costBasisChange = costBasis ? ((currentPrice - costBasis) / costBasis) * 100 : 0;
+            const changeSign = costBasisChange > 0 ? "+" : "";
+            changeEl.className = costBasisChange >= 0 ? "change up" : "change down";
+            changeEl.textContent = "(" + changeSign + costBasisChange.toFixed(1) + "%)";
+
+            costBasisEl.append("Cost basis: ", changeEl, " $" + costBasis.toFixed(2));
+            container.appendChild(costBasisEl);
+        }
+        // ------------------------
         // Append OPTION possibilities
         // ------------------------
         if (contractsOwned > coveredCalls) {

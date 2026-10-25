@@ -29,6 +29,7 @@ h1 {
   align-items: center;
   padding: 16px;
   border-radius: 12px;
+  margin-top: 10px;
   margin-bottom: 15px;
   background: #1f2937;
   color: white;
@@ -64,6 +65,14 @@ h1 {
   color: #4ade80;
 }
 
+.cost-basis {
+  font-size: 14px;
+  padding-right: 14px;
+  color: #A3ACBA;
+}
+.cost-basis .up {
+  color: #4ade80;
+}
 .text-white {
   color: white;
 }
@@ -76,6 +85,10 @@ h1 {
   text-align: left;
 }
 
+.text-right {
+  text-align: right;
+}
+
 .position-relative {
   position: relative;
 }
@@ -85,7 +98,6 @@ h1 {
 }
 
 .options {
-  margin-top: -10px;
   margin-bottom: 16px;
   padding-left: 10px;
 }
