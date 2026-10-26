@@ -73,6 +73,10 @@ h1 {
 .cost-basis .up {
   color: #4ade80;
 }
+.cost-basis .down {
+  color: #f87171;
+}
+
 .text-white {
   color: white;
 }
